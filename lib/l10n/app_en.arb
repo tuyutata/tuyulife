@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appName": "TuyuLife",
+  "frameworkTitle": "TuyuLife System Framework",
+  "frameworkReady": "The iOS and Android framework is connected. Lifestyle modules will be implemented in later documented steps.",
+  "frameworkUnavailable": "The application framework is unavailable."
+}

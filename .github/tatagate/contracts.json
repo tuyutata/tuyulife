@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "repository": "tuyulife",
+  "workflows": [
+    "tuyulife.android.ci",
+    "tuyulife.android.release",
+    "tuyulife.ios.ci",
+    "tuyulife.ios.release"
+  ],
+  "node_tests": [
+    "scripts/ci/android/life-android/test.mjs",
+    "scripts/ci/ios/life-ios/test.mjs",
+    "scripts/project.test.mjs",
+    "scripts/release/android/life-android/test.mjs",
+    "scripts/release/ios/life-ios/test.mjs"
+  ],
+  "checks": [
+    "repository-contracts"
+  ],
+  "tools": {
+    "node": "25.2.1",
+    "actionlint": "1.7.12",
+    "rust": null
+  },
+  "platform_forbidden_values": [
+    "macOS ARM64",
+    "macos-arm64",
+    "macos_arm64"
+  ]
+}

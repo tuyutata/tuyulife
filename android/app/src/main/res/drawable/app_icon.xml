@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 按系统版本选择资源，位图继续引用既有权威副本。 -->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@mipmap/ic_launcher" android:gravity="fill" android:filter="true" />

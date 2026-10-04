@@ -1,0 +1,5 @@
+package com.tuyulife
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()

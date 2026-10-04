@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh",
+  "appName": "途遇生活",
+  "frameworkTitle": "途遇生活系统工程",
+  "frameworkReady": "iOS、Android 基础框架已接入，生活业务模块将在后续步骤按技术文档实现。",
+  "frameworkUnavailable": "基础框架当前不可用。"
+}

@@ -1,0 +1,27 @@
+name: tuyulife
+description: TuyuLife independent iOS and Android application.
+publish_to: "none"
+# iOS 与 Android 的正式首版从 1.0.0 起步；后续分别按自身正式 Release 递增。
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.12.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+  provider: ^6.1.5+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 6.0.0
+
+flutter:
+  generate: true
+  assets:
+    - tuyu_logo.png
+  uses-material-design: true
