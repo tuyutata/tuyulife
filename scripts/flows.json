@@ -36,6 +36,18 @@
         {
           "id": "python",
           "version": "3.14.3"
+        },
+        {
+          "id": "bash",
+          "version": "5.3.20"
+        },
+        {
+          "id": "grep",
+          "version": "3.12"
+        },
+        {
+          "id": "sed",
+          "version": "4.10"
         }
       ],
       "locks": [
@@ -92,8 +104,25 @@
             "id": "xcode",
             "version": "27.0"
           }
-        ]
-      }
+        ],
+        "version_source": {
+          "kind": "pubspec",
+          "path": "pubspec.yaml"
+        },
+        "record_source": {
+          "kind": "manifest",
+          "asset_names": [],
+          "metadata_asset": "release-manifest.json",
+          "source_field": "git_commit_sha",
+          "version_field": "software_version",
+          "marker_prefix": "GMB",
+          "immutable": false
+        }
+      },
+      "completion": "device-install",
+      "files": [
+        "ios.app.zip"
+      ]
     },
     "android": {
       "tools": [
@@ -148,6 +177,18 @@
         {
           "id": "xcode",
           "version": "27.0"
+        },
+        {
+          "id": "bash",
+          "version": "5.3.20"
+        },
+        {
+          "id": "grep",
+          "version": "3.12"
+        },
+        {
+          "id": "sed",
+          "version": "4.10"
         }
       ],
       "locks": [
@@ -236,8 +277,72 @@
             "id": "android-ndk",
             "version": "28.2.13676358"
           }
-        ]
-      }
+        ],
+        "version_source": {
+          "kind": "pubspec",
+          "path": "pubspec.yaml"
+        },
+        "record_source": {
+          "kind": "manifest",
+          "asset_names": [],
+          "metadata_asset": "release-manifest.json",
+          "source_field": "git_commit_sha",
+          "version_field": "software_version",
+          "marker_prefix": "GMB",
+          "immutable": false
+        }
+      },
+      "completion": "device-install",
+      "files": [
+        "android.apk"
+      ]
     }
-  }
+  },
+  "remote_routes": [
+    {
+      "canonicalID": "tuyulife.android.ci",
+      "repository": "tuyulife",
+      "productID": "tuyulife",
+      "productTitle": "途遇生活",
+      "flow": "ci",
+      "platform": "android",
+      "expectedTitle": "途遇生活 · CI · Android",
+      "tagPrefix": null,
+      "recordsFormalRelease": false
+    },
+    {
+      "canonicalID": "tuyulife.android.release",
+      "repository": "tuyulife",
+      "productID": "tuyulife",
+      "productTitle": "途遇生活",
+      "flow": "release",
+      "platform": "android",
+      "expectedTitle": "途遇生活 · Release · Android",
+      "tagPrefix": "tuyulife-android-v",
+      "recordsFormalRelease": true
+    },
+    {
+      "canonicalID": "tuyulife.ios.ci",
+      "repository": "tuyulife",
+      "productID": "tuyulife",
+      "productTitle": "途遇生活",
+      "flow": "ci",
+      "platform": "ios",
+      "expectedTitle": "途遇生活 · CI · iOS",
+      "tagPrefix": null,
+      "recordsFormalRelease": false
+    },
+    {
+      "canonicalID": "tuyulife.ios.release",
+      "repository": "tuyulife",
+      "productID": "tuyulife",
+      "productTitle": "途遇生活",
+      "flow": "release",
+      "platform": "ios",
+      "expectedTitle": "途遇生活 · Release · iOS",
+      "tagPrefix": "tuyulife-ios-v",
+      "recordsFormalRelease": true
+    }
+  ],
+  "flow_entry": "scripts/flow.mjs"
 }

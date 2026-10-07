@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync,
   rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { tmpdir } from 'node:os';
+import { testRoot as tmpdir } from './build.mjs';
 import test from 'node:test';
 import { createProject, platformEntries, verifyProject } from './project.mjs';
 
@@ -17,8 +17,8 @@ function fixture(t) {
     assert.equal(current.dev, owned.dev);
     rmSync(root, { recursive: true });
   });
-  const source = join(root, 'source'), work = join(root, 'work'), tool = join(root, 'tool');
-  for (const p of [source, work, tool]) mkdirSync(p);
+  const source = join(root, 'source'), work = join(source, 'target', 'ios', 'test'), tool = join(root, 'tool');
+  for (const p of [source, work, tool]) mkdirSync(p, { recursive: true });
   const write = (p, content) => { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, content); };
   write(join(source, 'pubspec.yaml'), 'name: project_fixture\nenvironment:\n  sdk: ">=3.12.0 <4.0.0"\n');
   write(join(source, 'lib/main.dart'), 'void main() {}\n');
@@ -71,7 +71,7 @@ test('既有输出与来源链接均不得覆盖', async t => {
 
 test('源码内输出、外部目标及链接父层必须拒绝', async t => {
   const f = fixture(t);
-  await assert.rejects(createProject({ ...f, work: f.source, platform: 'ios' }), /必须分离/);
+  await assert.rejects(createProject({ ...f, work: f.source, platform: 'ios' }), /本产品target/);
   await assert.rejects(createProject({ ...f, output: join(f.root, 'outside'), platform: 'ios' }), /属于本次工作根/);
   symlinkSync(f.source, join(f.work, 'redirect'), 'dir');
   await assert.rejects(createProject({ ...f, output: join(f.work, 'redirect/new'), platform: 'ios' }), /经过链接/);
