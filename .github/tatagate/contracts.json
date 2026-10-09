@@ -8,16 +8,15 @@
     "tuyulife.ios.release"
   ],
   "node_tests": [
-    "scripts/build-local.test.mjs",
-    "scripts/build.test.mjs",
-    "scripts/ci/android/life-android/test.mjs",
-    "scripts/ci/ios/life-ios/test.mjs",
-    "scripts/flow.test.mjs",
-    "scripts/project.test.mjs",
-    "scripts/release/android/life-android/test.mjs",
-    "scripts/release/ios/life-ios/test.mjs",
-    "scripts/resources.test.mjs",
-    "scripts/target.test.mjs"
+    "scripts/build.mjs",
+    "scripts/ci/android/life-android/execute.mjs",
+    "scripts/ci/ios/life-ios/execute.mjs",
+    "scripts/flow.mjs",
+    "scripts/project.mjs",
+    "scripts/release/android/life-android/execute.mjs",
+    "scripts/release/ios/life-ios/execute.mjs",
+    "scripts/resources.mjs",
+    "scripts/target.mjs"
   ],
   "checks": [
     "repository-contracts"
@@ -36,55 +35,49 @@
   "functions": [
     {
       "function": "scripts/build-local.test",
-      "path": "scripts/build-local.test.mjs",
-      "runner": "node",
-      "target": "node"
-    },
-    {
-      "function": "scripts/build.test",
-      "path": "scripts/build.test.mjs",
+      "path": "scripts/build.mjs",
       "runner": "node",
       "target": "node"
     },
     {
       "function": "scripts/ci/android/life-android/test",
-      "path": "scripts/ci/android/life-android/test.mjs",
+      "path": "scripts/ci/android/life-android/execute.mjs",
       "runner": "node",
       "target": "node"
     },
     {
       "function": "scripts/ci/ios/life-ios/test",
-      "path": "scripts/ci/ios/life-ios/test.mjs",
+      "path": "scripts/ci/ios/life-ios/execute.mjs",
       "runner": "node",
       "target": "node"
     },
     {
       "function": "scripts/flow.test",
-      "path": "scripts/flow.test.mjs",
+      "path": "scripts/flow.mjs",
       "runner": "node",
       "target": "node"
     },
     {
       "function": "scripts/project.test",
-      "path": "scripts/project.test.mjs",
+      "path": "scripts/project.mjs",
       "runner": "node",
       "target": "node"
     },
     {
       "function": "scripts/release/android/life-android/test",
-      "path": "scripts/release/android/life-android/test.mjs",
+      "path": "scripts/release/android/life-android/execute.mjs",
       "runner": "node",
       "target": "node"
     },
     {
       "function": "scripts/release/ios/life-ios/test",
-      "path": "scripts/release/ios/life-ios/test.mjs",
+      "path": "scripts/release/ios/life-ios/execute.mjs",
       "runner": "node",
       "target": "node"
     },
     {
       "function": "scripts/resources.test",
-      "path": "scripts/resources.test.mjs",
+      "path": "scripts/resources.mjs",
       "runner": "node",
       "target": "node"
     },
@@ -99,6 +92,12 @@
       "path": "test/product_contract_test.dart",
       "runner": "flutter",
       "target": "flutter"
+    },
+    {
+      "function": "scripts-target",
+      "path": "scripts/target.mjs",
+      "runner": "node",
+      "target": "node"
     }
   ]
 }

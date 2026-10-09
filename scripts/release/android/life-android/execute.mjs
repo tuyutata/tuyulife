@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { remoteEnvironment as productRemoteEnvironment } from '../../../build.mjs';
-if(process.env.GITHUB_ACTIONS==='true'&&String(process.env.GITHUB_WORKFLOW||'').startsWith('tuyulife.'))Object.assign(process.env,productRemoteEnvironment());
+if(!(process.env.NODE_TEST_CONTEXT && process.argv.length === 2)&&process.env.GITHUB_ACTIONS==='true'&&String(process.env.GITHUB_WORKFLOW||'').startsWith('tuyulife.'))Object.assign(process.env,productRemoteEnvironment());
 import { spawnSync as runExactProcess } from 'node:child_process';
 function validateCandidate(){const value=process.env;
 if(!/^[0-9a-f]{40}$/.test(value.SOURCE_SHA||'')||!/^[1-9][0-9]*$/.test(value.CI_RUN_ID||'')||!/^\d+\.\d{1,2}\.\d{1,2}$/.test(value.SOFTWARE_VERSION||'')||value.VERSION_TAG!=='tuyulife-android-v'+value.SOFTWARE_VERSION)throw Error('准确Release候选无效');}
@@ -50,8 +50,30 @@ const workflowSteps = Object.freeze({
 });
 function runExactWorkflowStep(index){requireExactRemoteJobEnvironment();if(!/^(?:0|[1-9][0-9]*)$/.test(String(index||''))||!Object.hasOwn(workflowSteps,String(index)))throw new Error('准确远端Job阶段无效');const step=workflowSteps[String(index)];const command=step.shell==='pwsh'?'pwsh':(process.platform==='win32'?'bash':'/bin/bash');const args=step.shell==='pwsh'?['-NoLogo','-NoProfile','-NonInteractive','-Command',step.source]:['--noprofile','--norc','-e','-o','pipefail','-c',step.source];const result=runExactProcess(command,args,{cwd:process.cwd(),env:process.env,stdio:'inherit'});if(result.error)throw new Error('准确远端Job阶段无法启动');if(result.status!==0)process.exitCode=Number.isInteger(result.status)?result.status:1;}
 
+if (!(process.env.NODE_TEST_CONTEXT && process.argv.length === 2) && process.argv[1] && import.meta.url === (await import('node:url')).pathToFileURL((await import('node:path')).resolve(process.argv[1])).href) {
 requireExactRemoteJobEnvironment();
 validateCandidate();
 if(process.argv[2]==='validate-inputs') process.exit(0);
 if(process.argv[2]!=='workflow-step')throw new Error('准确Release Job只接受workflow-step');
 runExactWorkflowStep(process.argv[3]);
+}
+
+// 正式实现结束；仅直接使用 node --test 执行本文件时注册以下回归。
+if (process.env.NODE_TEST_CONTEXT && process.argv.length === 2 && !process.execArgv.some(value=>/^(?:-e|--eval(?:=|$)|--input-type(?:=|$))/u.test(value)) && process.argv[1] && import.meta.url === (await import('node:url')).pathToFileURL((await import('node:path')).resolve(process.argv[1])).href) {
+const {default:assert} = await import('node:assert/strict');
+const { readFileSync } = await import('node:fs');
+const {default:test} = await import('node:test');
+
+test('tuyulife.android.release的life-android远端Job物理独立', () => {
+  const source = readFileSync(new URL('./execute.mjs', import.meta.url), 'utf8');
+  assert.ok(source.includes('{"pipeline":"tuyulife.android.release","job":"life-android"}'));
+  assert.match(source, /function runExactWorkflowStep\(index\)/u);
+  assert.match(source, /function requireExactRemoteJobEnvironment\(\)/u);
+});
+
+test('途遇生活iOS与Android从各自1.0.0正式首版开始', () => {
+  const pubspec = readFileSync(new URL('../../../../pubspec.yaml', import.meta.url), 'utf8');
+  assert.match(pubspec, /^version: 1\.0\.0\+1$/mu);
+});
+
+}
