@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import {withFixedWorkSync,claimFixedWork,releaseFixedWork} from '../../target.mjs';
+import {fixedScratch} from '../../target.mjs';
 import { remoteEnvironment as productRemoteEnvironment } from '../../build.mjs';
 if(process.env.GITHUB_ACTIONS==='true'&&String(process.env.GITHUB_WORKFLOW||'').startsWith('tuyulife.'))Object.assign(process.env,productRemoteEnvironment());
 // CI_BUILD: incremental
@@ -13,12 +15,13 @@ function run(command, args, cwd) {
   execFileSync(command, args, { cwd, stdio: 'inherit', env: process.env });
 }
 
-let projectWork, projectOwned;
+const projectSession=claimFixedWork('build',{retain:process.env.GITHUB_ACTIONS==='true'});
+let projectWork=projectSession.owner.work, projectOwned;
 try {
   // 本身份独占源码外工程，Flutter工具只写本次任务目录。
   process.env.TUYULIFE_ROOT = realpathSync(process.cwd());
   const source = realpathSync('.');
-  projectWork = mkdtempSync(join(realpathSync(process.env.RUNNER_TEMP || tmpdir()), 'tuyulife-ios-ci-'));
+  projectWork = projectSession.owner.work;
   projectOwned = lstatSync(projectWork);
   const project = execFileSync(process.execPath, [join(source, 'scripts/project.mjs'), 'create',
     '--source-root', source, '--work-root', projectWork, '--platform', 'ios'],
