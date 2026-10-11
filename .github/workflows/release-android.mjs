@@ -19,7 +19,7 @@ export async function lifeRelease(release,platform,readTag){
  return {version:versionAndTask[0],tag,run_id:Number(versionAndTask[1]),run_attempt:Number(versionAndTask[2]),source_sha:source.object.sha};
 }
 
-export const owner = Object.freeze({"product": "tuyulife", "platform": "android", "repository": "tuyutata/tuyulife", "version_source": {"kind": "pubspec", "path": "pubspec.yaml"}, "required_assets": [], "asset_locations": ["$RUNNER_TEMP/citizenweb-release.tgz", "$RUNNER_TEMP/citizenweb-candidate"], "asset_patterns": ["*.tgz", "release-manifest.json", "SHA256SUMS"], "required_patterns": ["*.tgz", "release-manifest.json", "SHA256SUMS"]});
+export const owner = Object.freeze({"product": "tuyulife", "platform": "android", "repository": "tuyutata/tuyulife", "version_source": {"kind": "pubspec", "path": "pubspec.yaml"}, "required_assets": ["tuyulife-unsigned-android.apk", "tuyulife-unsigned-android.aab", "tuyulife-unsigned-android.json"], "asset_locations": ["$RELEASE_WORK/unsigned"], "asset_patterns": ["tuyulife-unsigned-android.apk", "tuyulife-unsigned-android.aab", "tuyulife-unsigned-android.json"], "required_patterns": ["tuyulife-unsigned-android.apk", "tuyulife-unsigned-android.aab", "tuyulife-unsigned-android.json"]});
 const commands = Object.freeze({
   "1": {
     "shell": "bash",
@@ -189,8 +189,16 @@ export function job() {
   for (const [name,value] of Object.entries(variables)) { process.env[name]=value; output(name,value,process.env.GITHUB_ENV); }
 }
 
+// 原签名与正式清单脚本仍归本产品唯一实现；GitHub步骤禁止执行，只交付本机签名接口。
+export function localSigningSources() {
+  const sign=commands['5'],manifest=commands['6'];
+  if(sign?.shell!=='bash'||manifest?.shell!=='bash')throw Error('本仓本机签名脚本缺失');
+  return {sign:sign.source,manifest:manifest.source};
+}
+
 export function step(key) {
   runVersion();
+  if(key==='5'||key==='6')fail('正式签名与清单只能在本机执行');
   const value = commands[key];
   if (!value || !['bash','pwsh'].includes(value.shell)) fail('本目标构建步骤无效');
   const directory = join(process.env.RELEASE_WORK,'commands');mkdirSync(directory,{recursive:true});
@@ -251,29 +259,35 @@ export async function collectProduced() {
 
 
 
-export async function publish(directory) {
-  const identity=runVersion();const metadata=JSON.parse(readFileSync(join(directory,'automation.json'),'utf8'));
-  if(Object.entries(identity).some(([key,value])=>metadata[key]!==value)||!Array.isArray(metadata.assets)||!metadata.assets.length)fail('完整产物身份无效');
-  const files=metadata.assets;
-  if(readdirSync(directory).sort().join('\0')!==[...files.map(value=>value.name),'automation.json'].sort().join('\0'))fail('产物目录与完整资产集合不符');
-  for(const file of files){const path=join(directory,assetName(file.name));if(regular(path).size!==file.size||await digestFile(path)!==file.sha256)fail('正式产物在交付前改变');}
-  if(await request(`git/ref/tags/${encodeURIComponent(identity.tag)}`)!==null)fail('本次Tag已经存在');
-  await request('git/refs',{method:'POST',body:{ref:`refs/tags/${identity.tag}`,sha:identity.source_sha}});
-  const release=await request('releases',{method:'POST',body:{tag_name:identity.tag,target_commitish:identity.source_sha,
-    name:`${owner.product} · ${owner.platform} · ${identity.version}`,draft:false,prerelease:false,make_latest:'false',
-    body:`${owner.product} · ${owner.platform} · ${identity.version}\nSource: ${identity.source_sha}\nRun: ${identity.run_id} / ${identity.run_attempt}`}});
-  if(!Number.isSafeInteger(release?.id)||!release.upload_url)fail('正式Release创建未确认');
-  for(const file of files){const url=new URL(release.upload_url.replace(/\{.*$/u,''));url.searchParams.set('name',file.name);
-    const asset=await request(url.href,{method:'POST',body:createReadStream(join(directory,file.name)),size:file.size});
-    if(asset?.name!==file.name||asset.size!==file.size||asset.state!=='uploaded')fail('正式资产上传未确认');
-    const response=await request(asset.url,{raw:true});if(!response?.body)fail('正式资产回读失败');
-    const hash=createHash('sha256');let size=0;for await(const bytes of response.body){hash.update(bytes);size+=bytes.length;if(size>file.size)fail('正式资产回读超过声明大小');}
-    if(size!==file.size||hash.digest('hex')!==file.sha256)fail('GitHub资产逐件回读不一致');
-  }
-  const readback=await request(`releases/${release.id}`);if((await lifeRelease(readback,owner.platform,tag=>request('git/ref/tags/'+encodeURIComponent(tag))))?.run_id!==identity.run_id||readback.draft||readback.prerelease
-    ||readback.assets?.length!==files.length)fail('完整正式Release回查失败');
-  for(const file of files){const asset=readback.assets.find(value=>value.name===file.name);if(!asset||asset.state!=='uploaded'||asset.size!==file.size||asset.digest!==`sha256:${file.sha256}`)fail('完整正式资产证明回查失败');}
-  output('verified','true');output('release_id',release.id);output('tag',identity.tag);
+// CI只收集未签名候选；正式签名材料绝不进入GitHub任务。
+export async function unsigned() {
+  const identity=runVersion(),project=resolve(process.env.TUYULIFE_PROJECT_ROOT);
+  if(!isAbsolute(project)||!lstatSync(project).isDirectory()||realpathSync(project)!==project)fail('未签名工程目录无效');
+  const directory=join(process.env.RELEASE_WORK,'unsigned');
+  if(existsSync(directory))fail('未签名候选目录已存在');
+  mkdirSync(directory,{mode:0o700});
+  const stem=owner.product+'-unsigned-'+owner.platform,inputs=[];
+  if(owner.platform.endsWith('android')) {
+    for(const [relative,name] of [
+      ['build/app/outputs/flutter-apk/app-release.apk',stem+'.apk'],
+      ['build/app/outputs/bundle/release/app-release.aab',stem+'.aab']]) {
+      const source=join(project,relative);regular(source);
+      const target=join(directory,name);copyFileSync(source,target);inputs.push(target);
+    }
+  } else if(owner.platform.endsWith('ios')) {
+    const app=join(project,'build/ios/iphoneos/Runner.app');
+    if(!lstatSync(app).isDirectory()||realpathSync(app)!==app)fail('iOS未签名应用无效');
+    const archive=join(directory,stem+'.zip');
+    const result=spawnSync('/usr/bin/ditto',['-c','-k','--keepParent',app,archive],{stdio:'ignore'});
+    if(result.error||result.status!==0)fail('iOS未签名应用封装失败');
+    regular(archive);inputs.push(archive);
+  } else fail('本仓未声明的移动平台');
+  const assets=[];for(const path of inputs)assets.push({name:basename(path),size:regular(path).size,sha256:await digestFile(path)});
+  const manifest=join(directory,stem+'.json');
+  writeFileSync(manifest,JSON.stringify({schema:1,product_id:owner.product,platform:owner.platform,repository:owner.repository,
+    version:identity.version,tag:identity.tag,source_sha:identity.source_sha,run_id:identity.run_id,
+    run_attempt:identity.run_attempt,run_number:identity.run_number,workflow:workflowPath,assets},null,2)+'\n',{flag:'wx',mode:0o600});
+  return collectProduced();
 }
 
 function ownedRun(run) {
@@ -349,7 +363,7 @@ async function discardCurrent(identity,api) {
     if(metadata?.run_id===identity.run_id&&metadata.run_attempt===identity.run_attempt)
       await removeRunRelease({id:identity.run_id,head_sha:identity.source_sha},[release],api);
   }
-  const tag=process.env.RELEASE_TAG;
+  const tag=identity.tag;
   if(tag&&tag.startsWith(prefix)&&tag.endsWith(`-r${identity.run_id}-a${identity.run_attempt}`)){
     const path=`git/refs/tags/${encodeURIComponent(tag)}`;
     if(await api(path.replace(/^git\/refs\//u,'git/ref/'))!==null)await remove(path,api);
@@ -631,7 +645,7 @@ if(direct&&!testing){
   try{const [command,...args]=process.argv.slice(2);
     if(command==='project')await projectInternals.runProjectCLI(args);else if(command==='prepare')await prepare();else if(command==='job')job();else if(command==='step')step(args[0]);
     else if(command==='action')action(args[0],args.slice(1));else if(command==='collect')await collect(args);
-    else if(command==='collect-produced')await collectProduced();else if(command==='publish')await publish(args[0]);else if(command==='finish')await finish();
+    else if(command==='collect-produced')await collectProduced();else if(command==='unsigned')await unsigned();
     else if(!await productCommand(command,args))fail('自动化命令无效');
   }catch(error){console.error(error.message);process.exitCode=1;}
 }
