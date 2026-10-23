@@ -344,7 +344,6 @@ GitHub接口使用普通参数和已授权令牌，返回本仓既有版本计�
 
 ## 外部调用入口
 
-本仓现有 scripts/config.mjs 的 describeAction({flow,platform}) 声明流程入口。自动化启动逻辑、版本输入与平台选择归本仓；调用方交付已授权令牌和标准 read/dispatch 传输能力，接收准确 Run 编号。既有独立自动化接口继续由本仓实现。未提供的安装或发布入口明确报产品侧未声明，不错接到编译，也不产生成功回执。
 
 
 本机安装统一由塔塔控制台app/source/Installer.swift执行。本产品scripts/build.mjs的compile PLATFORM仅准备依赖、编译并输出TATA_COMPILE公开产物回执，持有本轮现场直到调用方关闭stdin后按原规则清场；产品不再实现开发签名Keychain、ADB或devicectl安装。GitHub流程仍称塔塔自动化。
@@ -354,3 +353,5 @@ GitHub接口使用普通参数和已授权令牌，返回本仓既有版本计�
 固定根回归子进程显式保留本轮测试身份和会话，不进入生产target/test；收尾回归在自身作用域导入fs，旧release脚本专属测试只在确有残留时删除。Git工具仍按原公开声明交付并校验，不使用其它版本或伪造版本。
 
 LOCAL_BUILD_SOURCE在注册编译回归前完成初始化；编译正文保持原字节，测试仍运行同一公开入口。
+
+本产品scripts/config.mjs的describeAction仅返回repository、workflow、ref、inputs，或既有本地进程命令声明；不导入构建实现、不派发GitHub请求、不处理令牌、版本或历史。控制台使用统一数据接口直接派发并只读观察准确Run；产品GitHub业务归所属既有YAML。本次自动化Run名称使用运行编号，正式构建及产物保持版本名称。已有工具和依赖复用，缺少时才按原声明准备。
