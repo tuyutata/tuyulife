@@ -324,7 +324,7 @@ iOS 本机编译只生成无签名候选：Flutter 使用 build ios --release --
 
 ## 配置需求公开接口
 
-本仓 `scripts/config.mjs` 声明生活端 Android 的 APP_KEY、iOS 的 IOS_KEY 和 APP_PROFILE，均为本产品独立保密签名材料；现行产品流程没有消费旧控制台的 ASC 或 Google Play 凭据。保密签名配置保持现有声明；独立发布所用的候选验真、本机发布签名、资产上传及发布后清理入口已移除。
+本仓 `scripts/config.mjs` 声明生活端 Android 的 APP_KEY、iOS 的 IOS_KEY 和 TUYULIFE_PROFILE，均为本产品独立保密签名材料；现行产品流程没有消费旧控制台的 ASC 或 Google Play 凭据。保密签名配置保持现有声明；独立发布所用的候选验真、本机发布签名、资产上传及发布后清理入口已移除。
 
 控制台任务取消信号传入本仓签名和发布接口。本机工具终止本轮进程组并等待退出，iOS 钥匙串搜索列表仍在收尾阶段恢复；上传中止后独立回查本次已确认归属的 Tag/Release，撤销并确认不存在。创建回执不明时不删除同名远端资源，准确报告未闭合失败。
 
@@ -355,3 +355,5 @@ GitHub接口使用普通参数和已授权令牌，返回本仓既有版本计�
 LOCAL_BUILD_SOURCE在注册编译回归前完成初始化；编译正文保持原字节，测试仍运行同一公开入口。
 
 本产品scripts/config.mjs的describeAction仅返回repository、workflow、ref、inputs，或既有本地进程命令声明；不导入构建实现、不派发GitHub请求、不处理令牌、版本或历史。控制台使用统一数据接口直接派发并只读观察准确Run；产品GitHub业务归所属既有YAML。本次自动化Run名称使用运行编号，正式构建及产物保持版本名称。已有工具和依赖复用，缺少时才按原声明准备。
+
+本产品配置项统一为name、description、accessLevel、kind、format五个必填字段；不适用规则明确填写“不适用”。name严格使用两组大写字母和一个下划线，同名共用控制台唯一值，当前页仅汇总实际声明的使用产品。操作列固定写入/更换、查看、删除；保密查看保留生物识别。现有配置消费者随声明同步改名，官方工具/API字段保持官方名称，不新增旧名兼容或配置副本。
