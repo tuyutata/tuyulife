@@ -358,3 +358,8 @@ LOCAL_BUILD_SOURCE在注册编译回归前完成初始化；编译正文保持�
 
 本产品配置项统一为name、description、accessLevel、kind、format五个必填字段；不适用规则明确填写“不适用”。name严格使用两组大写字母和一个下划线，同名共用控制台唯一值，当前页仅汇总实际声明的使用产品。操作列固定写入/更换、查看、删除；保密查看保留生物识别。现有配置消费者随声明同步改名，官方工具/API字段保持官方名称，不新增旧名兼容或配置副本。
 描述文件使用TUYULIFE_PROFILE，format绑定真实iOS Bundle身份；不能将其它产品描述文件冒认成本产品已配置。
+
+
+## 第一方业务命名与固定合同
+
+产品身份只由TuyuLifeProduct.productId定义；删除相同值的独立audience常量。Dart保持lowerCamelCase，技术名称、Bundle身份及独立数据空间不变。本产品未定义自有业务关系表。
