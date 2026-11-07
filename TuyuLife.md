@@ -36,13 +36,9 @@ iOS 与 Android 分别拥有自己的 Release Tag 与版本序列；`pubspec.yam
 
 ## 聊天功能的唯一产品归属
 
-**聊天客户端的逻辑功能只能在 TataChatSDK 中实现；聊天服务端的逻辑功能只能在 CitizenServe.tatachat 中实现。公民、途遇及其他产品只依赖使用。**
+聊天客户端归公民App的chat普通本地包，随App源码构建；协议唯一源为公民App的network/proto。聊天服务端归CitizenServe的chat模块。本产品不声明独立聊天客户端产品或分发路线。
 
 TuyuLife 涉及聊天时只作为依赖使用方；本条不代表尚未接入聊天的产品已经具备聊天能力。
-
-- 消息、会话、群组、加密、协议、传输、同步、重试、聊天存储、附件、通话及聊天界面行为，按客户端与服务端职责分别归 TataChatSDK 和 CitizenServe.tatachat；新增功能、缺陷修复和平台差异也必须在所属产品内完成。
-- 消费产品只提供产品入口、身份与业务权益结果、服务地址及授权、主题和公开接口要求的平台配置；只通过公开接口接入，禁止复制、重写、包装成另一套聊天内核或维护产品专属聊天实现。CitizenServe、TuyuServe 的产品身份与权益授权不包含聊天数据面的实现职责。
-- 本机开发直接依赖仓库路径；公民、途遇等产品的正式版本依赖塔塔聊天正式 Release；第三方市场分发使用公开市场版本。依赖使用不以公开市场发布为前置条件，也不改变实现归属。
 
 受控缓存固定为 `tuyulife/target/<platform>/<build|ci|release>/`；各流程目录独立，启动不建目录。Flutter视图、依赖展开、`.dart_tool`、Gradle、Pods、临时文件、日志和候选均只写准确流程目录。
 
@@ -248,10 +244,6 @@ iOS真机交互、页面验收和交易诊断必须使用XCTest，UI测试必须
 
 ### 产品独立资源与原件缓存
 
-
-
-
-
 错来源、摘要、重复同源内容、生成状态、硬链接、内部链接越界或循环、取消及任务副本漂移均据实失败。独立与控制台调用使用同一实现；控制台只交付普通工具路径和已授权输入并跟踪原有任务，UI、功能、按钮、平台与操作顺序保持。用例源码已同步，执行留待整项实现结束后的统一测试。
 
 ### 独立入口回归验真边界
@@ -317,7 +309,6 @@ iOS 本机编译只生成无签名候选：Flutter 使用 build ios --release --
 
 本仓 .github/ 仅保留 workflows/ 与 tatagate/。Workflow 自行执行产品自动化，tatagate.json 与 tatagate.mjs 只登记并只读核对本仓静态合同；产品测试由 Build 或对应 Workflow 执行。
 
-
 ## 塔塔鹿鹿与自动化
 
 本仓 `.github/tatalulu.yml` 只登记准确仓库身份与main分支。塔塔控制台直接保存、推送并回查GitHub main；本仓自动化由既有平台工作流显式发起。
@@ -344,8 +335,6 @@ GitHub接口使用普通参数和已授权令牌，返回本仓既有版本计�
 
 ## 外部调用入口
 
-
-
 本机安装统一由塔塔控制台app/source/Installer.swift执行。本产品scripts/build.mjs的compile PLATFORM仅准备依赖、编译并输出TATA_COMPILE公开产物回执，持有本轮现场直到调用方关闭stdin后按原规则清场；产品不再实现开发签名Keychain、ADB或devicectl安装。GitHub流程仍称塔塔自动化。
 
 本机和自动化使用build.mjs内已有Node回归；测试清单删除已不存在的旧release-android.mjs/release-ios.mjs引用，不创建替代脚本。
@@ -359,11 +348,9 @@ LOCAL_BUILD_SOURCE在注册编译回归前完成初始化；编译正文保持�
 本产品配置项统一为name、description、accessLevel、kind、format五个必填字段；不适用规则明确填写“不适用”。name严格使用两组大写字母和一个下划线，同名共用控制台唯一值，当前页仅汇总实际声明的使用产品。操作列固定写入/更换、查看、删除；保密查看保留生物识别。现有配置消费者随声明同步改名，官方工具/API字段保持官方名称，不新增旧名兼容或配置副本。
 描述文件使用TUYULIFE_PROFILE，format绑定真实iOS Bundle身份；不能将其它产品描述文件冒认成本产品已配置。
 
-
 ## 第一方业务命名与固定合同
 
 产品身份只由TuyuLifeProduct.productId定义；删除相同值的独立audience常量。Dart保持lowerCamelCase，技术名称、Bundle身份及独立数据空间不变。本产品未定义自有业务关系表。
-
 
 ## 本机编译资源与版本来源
 
