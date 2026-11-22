@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-// 本产品独立拥有资源需求、工程准备与编译；公开回执仅提供验真资源，不提供执行命令。
+// 准备途遇生活的移动端工程与构建资源，编译并核验iOS和Android产物。
+// 管理对应平台的工作目录、进程与收尾回执。
+
 import {spawn,spawnSync} from 'node:child_process';
 import {AsyncLocalStorage} from 'node:async_hooks';
 import {rmSync,rmdirSync,chmodSync,closeSync,openSync,renameSync,readlinkSync,unlinkSync,copyFileSync,existsSync,lstatSync,mkdirSync,readFileSync,readdirSync,realpathSync,symlinkSync,writeFileSync} from 'node:fs';
@@ -409,6 +411,7 @@ export async function build(platform,work,receipt,base) {
 
 async function buildApplication(platform,work,project,env,shell) {
   await run(shell,['--noprofile','--norc','-e','-o','pipefail','-c',LOCAL_BUILD_SOURCE,'tuyulife-build',platform,project,work],{...env,PRODUCT_BUILD_ROOT:root},project);
+  await generatedHeaders(project);
 }
 
 // 每次调用拥有自己的取消和进程集合，导入API并发也不能共享执行状态。
@@ -2641,4 +2644,24 @@ if(process.env.NODE_TEST_CONTEXT&&process.argv.length===2){
    const zipped=appleSigning(archive,work);assert.equal(zipped.at(-1).path,'.');assert.match(fs.readFileSync(zipped.at(-1).entitlements,'utf8'),/allow-jit/u);
   }finally{fs.rmSync(work,{recursive:true,force:true});}
  });
+}
+
+// 为明确的第一方生成输出写入职责简介；保留工具指令、许可和全部生成代码。
+export async function generatedHeaders(source) {
+ const {readFile,writeFile}=await import('node:fs/promises');
+ const files={
+  "lib/l10n/app_localizations.dart": "声明途遇生活本地化文案接口及Flutter语言加载。",
+  "lib/l10n/app_localizations_en.dart": "提供途遇生活界面的英文文案。",
+  "lib/l10n/app_localizations_zh.dart": "提供途遇生活界面的中文文案。"
+};
+ for(const [name,intro] of Object.entries(files)){
+  const path=join(source,name);let text;
+  try{text=await readFile(path,'utf8');}catch(error){if(error.code==='ENOENT')continue;throw error;}
+  const header=(name.endsWith('.rs')?'//! ':'// ')+intro;
+  if(text.startsWith(header+'\n'))continue;
+  const first=text.slice(0,text.indexOf('\n'));
+  if(/^(?:\/\/!?|#) [\u3400-\u9fff]/u.test(first)&&!/(?:版权|版权所有)/u.test(first))text=text.slice(first.length).replace(/^\n+/u,'');
+  text=header+'\n\n'+text;
+  await writeFile(path,text);
+ }
 }

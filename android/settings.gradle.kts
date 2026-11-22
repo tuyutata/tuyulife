@@ -1,3 +1,5 @@
+// 装配途遇生活Android工程，读取Flutter插件并登记应用模块。
+
 import groovy.json.JsonSlurper
 
 pluginManagement {

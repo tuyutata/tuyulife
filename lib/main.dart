@@ -1,3 +1,5 @@
+// 初始化Flutter并通过应用状态作用域启动途遇生活。
+
 import 'package:flutter/widgets.dart';
 import 'package:tuyulife/app/app.dart';
 import 'package:tuyulife/app/app_scope.dart';

@@ -1,3 +1,5 @@
+// 保留途遇生活iOS宿主的XCTest入口，当前示例测试为空。
+
 import Flutter
 import UIKit
 import XCTest

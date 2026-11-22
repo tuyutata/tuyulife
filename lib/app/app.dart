@@ -1,3 +1,5 @@
+// 配置途遇生活应用主题、本地化和首页，解析设备语言。
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:tuyulife/home_page.dart';

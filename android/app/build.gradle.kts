@@ -1,3 +1,5 @@
+// 配置途遇生活Android应用身份、Flutter编译和按语言生成的安装名称资源。
+
 import groovy.json.JsonSlurper
 import java.util.Properties
 

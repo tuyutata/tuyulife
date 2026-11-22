@@ -1,3 +1,5 @@
+// 初始化途遇生活iOS宿主，并向隐式Flutter引擎登记插件。
+
 import Flutter
 import UIKit
 

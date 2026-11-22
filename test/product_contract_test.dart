@@ -1,3 +1,5 @@
+// 核对途遇生活的产品身份、多语言安装名称和HTTPS入口约束。
+
 import 'dart:convert';
 import 'dart:io';
 

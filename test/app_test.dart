@@ -1,3 +1,5 @@
+// 验证途遇生活首页名称及设备语言的中文回退行为。
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tuyulife/app/app.dart';

@@ -1,4 +1,7 @@
+// 解析并校验途遇生活服务地址的HTTPS协议、主机和用户信息字段。
+
 /// 校验途遇生活的业务网络入口，运行时不允许明文协议。
+
 final class SecureEndpoint {
   SecureEndpoint._(this.uri);
 

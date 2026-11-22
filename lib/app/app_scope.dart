@@ -1,3 +1,5 @@
+// 为途遇生活组件树提供唯一的应用级状态实例。
+
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
